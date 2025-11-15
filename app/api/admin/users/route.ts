@@ -5,7 +5,7 @@ import { hasAdminRole } from '@/lib/auth/roles';
 import { getAdminUsers } from '@/lib/data/dashboard';
 
 export async function GET() {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
