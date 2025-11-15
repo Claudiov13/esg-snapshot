@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id                  String        @id
+  email               String        @unique
+  role                String        @default("user")
+  documentsUploaded   Int           @default(0)
+  subscriptionStatus  String        @default("trialing")
+  documents           Document[]
+  subscriptions       Subscription[]
+  createdAt           DateTime      @default(now()) @map("created_at")
+}
+
+model Document {
+  id         String   @id @default(uuid())
+  user       Profile  @relation(fields: [userId], references: [id])
+  userId     String   @map("user_id")
+  title      String
+  storagePath String  @map("storage_path")
+  status     String   @default("processing")
+  createdAt  DateTime @default(now()) @map("created_at")
+}
+
+model Subscription {
+  id                String   @id
+  user              Profile  @relation(fields: [userId], references: [id])
+  userId            String   @map("user_id")
+  plan              String
+  status            String
+  currentPeriodEnd  DateTime? @map("current_period_end")
+  createdAt         DateTime  @default(now()) @map("created_at")
+}

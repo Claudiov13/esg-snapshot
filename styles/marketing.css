@@ -1,0 +1,48 @@
+.hero {
+  padding: 5rem 0;
+}
+
+.hero h1 {
+  font-size: clamp(2.8rem, 5vw, 4rem);
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  color: var(--gray-500);
+  font-size: 1.15rem;
+  max-width: 560px;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.pricing-card {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  background: #fff;
+}
+
+.pricing-card--featured {
+  border: 2px solid var(--brand-primary);
+  box-shadow: 0 20px 60px rgba(0, 133, 111, 0.15);
+}
+
+.pricing-card h3 {
+  margin: 0 0 0.5rem 0;
+}
+
+.pricing-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.pricing-card li {
+  padding: 0.25rem 0;
+  color: var(--gray-600);
+}
