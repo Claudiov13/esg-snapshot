@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { validatePdf } from '@/lib/uploads/validator';
 import { uploadPdf } from '@/lib/uploads/storage';
 
 export async function POST(request: Request) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }

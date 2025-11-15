@@ -1,4 +1,5 @@
 ﻿import Link from 'next/link';
+import Image from 'next/image';
 import { MainNav } from '@/components/navigation/main-nav';
 
 export function SiteHeader() {
@@ -6,7 +7,7 @@ export function SiteHeader() {
     <header style={{ padding: '1.5rem 0', borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}>
-          <img src="/logo.svg" width={32} height={32} alt="ESG Snapshot" />
+          <Image src="/logo.svg" width={32} height={32} alt="ESG Snapshot" />
           ESG Snapshot
         </Link>
         <MainNav />
