@@ -3,7 +3,7 @@
     <section style={{ padding: '4rem 0' }}>
       <div className="container card">
         <h1>Fale com nosso time</h1>
-        <p style={{ color: 'var(--gray-500)' }}>Envie um email para hello@esgsnapshot.dev ou agende uma demo preenchendo o formulário abaixo.</p>
+        <p style={{ color: 'var(--gray-500)' }}>Envie um email para claudiovargas77@gmail.com ou agende uma demo preenchendo o formulário abaixo.</p>
         <form style={{ display: 'grid', gap: '1rem', marginTop: '2rem' }}>
           <label>
             Nome
