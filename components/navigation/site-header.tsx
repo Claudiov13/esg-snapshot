@@ -1,5 +1,6 @@
 ﻿import Link from 'next/link';
 import Image from 'next/image';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { MainNav } from '@/components/navigation/main-nav';
 
 export function SiteHeader() {
@@ -11,9 +12,21 @@ export function SiteHeader() {
           ESG Snapshot
         </Link>
         <MainNav />
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Link href="/sign-in" className="btn btn-ghost" style={{ padding: '0.5rem 1rem' }}>Entrar</Link>
-          <Link href="/sign-up" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem' }}>Criar conta</Link>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <SignedOut>
+            <Link href="/sign-in" className="btn btn-ghost" style={{ padding: '0.5rem 1rem' }}>
+              Entrar
+            </Link>
+            <Link href="/sign-up" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem' }}>
+              Criar conta
+            </Link>
+          </SignedOut>
+          <SignedIn>
+            <Link href="/dashboard" className="btn btn-secondary" style={{ padding: '0.5rem 1rem' }}>
+              Abrir painel
+            </Link>
+            <UserButton appearance={{ elements: { userButtonAvatarBox: { width: 36, height: 36 } } }} afterSignOutUrl="/" />
+          </SignedIn>
         </div>
       </div>
     </header>
