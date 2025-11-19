@@ -10,7 +10,10 @@ export async function uploadPdf(userId: string, fileBuffer: Buffer, fileName: st
   });
 
   if (storageError) {
-    throw storageError;
+    if (storageError.message.includes('does not exist')) {
+      throw new Error('Bucket "documents" não encontrado no Supabase. Execute supabase/storage.sql para criá-lo.');
+    }
+    throw new Error(storageError.message);
   }
 
   const { error: insertError } = await supabase.from('documents').insert({
@@ -21,7 +24,7 @@ export async function uploadPdf(userId: string, fileBuffer: Buffer, fileName: st
   });
 
   if (insertError) {
-    throw insertError;
+    throw new Error(insertError.message);
   }
 
   return path;

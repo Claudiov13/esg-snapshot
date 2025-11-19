@@ -16,6 +16,7 @@ model Profile {
   subscriptionStatus  String        @default("trialing")
   documents           Document[]
   subscriptions       Subscription[]
+  reports             EsgReport[]
   createdAt           DateTime      @default(now()) @map("created_at")
 }
 
@@ -27,6 +28,7 @@ model Document {
   storagePath String  @map("storage_path")
   status     String   @default("processing")
   createdAt  DateTime @default(now()) @map("created_at")
+  reports    EsgReportDocument[]
 }
 
 model Subscription {
@@ -37,4 +39,39 @@ model Subscription {
   status            String
   currentPeriodEnd  DateTime? @map("current_period_end")
   createdAt         DateTime  @default(now()) @map("created_at")
+}
+
+model EsgReport {
+  id               String               @id @default(uuid())
+  user             Profile              @relation(fields: [userId], references: [id])
+  userId           String               @map("user_id")
+  companyName      String?              @map("company_name")
+  industry         String?
+  companySize      String?              @map("company_size")
+  region           String?
+  maturity         String?
+  themes           String?
+  website          String?
+  status           String               @default("generated")
+  executiveSummary String?              @map("executive_summary")
+  ods              Json?
+  griTopics        Json?                @map("gri_topics")
+  riskMatrix       Json?                @map("risk_matrix")
+  actionPlan       Json?                @map("action_plan")
+  kpis             Json?
+  score            Json?                @default(dbgenerated("'{}'::jsonb"))
+  inputs           Json?                @default(dbgenerated("'{}'::jsonb"))
+  supplierSummary  String?              @map("supplier_summary")
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @default(now()) @map("updated_at")
+  documents        EsgReportDocument[]
+}
+
+model EsgReportDocument {
+  report     EsgReport @relation(fields: [reportId], references: [id])
+  reportId   String    @map("report_id")
+  document   Document  @relation(fields: [documentId], references: [id])
+  documentId String    @map("document_id")
+
+  @@id([reportId, documentId])
 }

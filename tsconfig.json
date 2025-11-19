@@ -19,8 +19,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "types": [
-      "node",
-      "@types/node"
+      "node"
     ],
     "baseUrl": ".",
     "paths": {

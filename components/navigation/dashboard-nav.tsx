@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 const items = [
   { href: '/dashboard', label: 'Visão Geral' },
   { href: '/dashboard/documents', label: 'Documentos' },
+  { href: '/dashboard/reports', label: 'Relatórios' },
   { href: '/dashboard/billing', label: 'Faturamento' }
 ];
 
@@ -15,7 +16,7 @@ export function DashboardNav() {
   return (
     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
       {items.map((item) => {
-        const active = pathname === item.href;
+        const active = pathname === item.href || (pathname?.startsWith(item.href) && item.href !== '/dashboard');
         return (
           <Link
             key={item.href}

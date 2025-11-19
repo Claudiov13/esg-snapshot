@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { DashboardShell } from '@/components/layouts/dashboard-shell';
@@ -22,6 +22,7 @@ export default async function DocumentsPage() {
               <th>Título</th>
               <th>Status</th>
               <th>Enviado em</th>
+              <th>Relatórios</th>
             </tr>
           </thead>
           <tbody>
@@ -32,6 +33,19 @@ export default async function DocumentsPage() {
                 </td>
                 <td>{doc.status}</td>
                 <td>{formatDate(doc.created_at)}</td>
+                <td>
+                  {doc.reports.length ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                      {doc.reports.map((report) => (
+                        <Link key={report.id} href={`/dashboard/reports/${report.id}`} className="badge" style={{ background: 'rgba(0,133,111,0.12)' }}>
+                          {report.company_name ?? 'Relatório'}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <span style={{ color: 'var(--gray-400)' }}>-</span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

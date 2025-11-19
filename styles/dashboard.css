@@ -39,3 +39,55 @@
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--gray-100);
 }
+
+.form-section {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 6px 30px rgba(15, 23, 42, 0.08);
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.form-section__header {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-grid--columns {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  padding: 0.65rem 0.85rem;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+.form-field textarea {
+  resize: vertical;
+}
+
+.form-hint {
+  color: var(--gray-500);
+  margin: 0;
+  font-size: 0.9rem;
+}

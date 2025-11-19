@@ -26,7 +26,8 @@ export function PdfUploadForm() {
         body: data
       });
       if (!res.ok) {
-        throw new Error(await res.text());
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error ?? 'Erro ao enviar');
       }
       setStatus('Upload realizado!');
       form.reset();
