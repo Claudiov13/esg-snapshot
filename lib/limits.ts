@@ -69,8 +69,9 @@ export async function getUsageLimits(userId: string, userEmail?: string): Promis
     .select('plan,status')
     .eq('user_id', userId);
 
-  const proSub = subsData.find((item) => item.plan === 'pro' && ACTIVE_STATUSES.includes(item.status));
-  const avulsoCount = subsData.filter((item) => item.plan === 'avulso' && ONE_OFF_STATUSES.includes(item.status)).length;
+  const subs = subsData ?? [];
+  const proSub = subs.find((item) => item.plan === 'pro' && ACTIVE_STATUSES.includes(item.status));
+  const avulsoCount = subs.filter((item) => item.plan === 'avulso' && ONE_OFF_STATUSES.includes(item.status)).length;
 
   const plan = proSub ? 'pro' : avulsoCount > 0 ? 'avulso' : 'trial';
   const status = proSub?.status ?? (avulsoCount > 0 ? 'paid' : 'trial');
@@ -94,7 +95,9 @@ export async function getUsageLimits(userId: string, userEmail?: string): Promis
     docQuery.gte('created_at', start);
   }
 
-  const [{ count: reportsCount = 0 }, { count: documentsCount = 0 }] = await Promise.all([reportQuery, docQuery]);
+  const [{ count: reportsCountRaw = 0 }, { count: documentsCountRaw = 0 }] = await Promise.all([reportQuery, docQuery]);
+  const reportsCount = reportsCountRaw ?? 0;
+  const documentsCount = documentsCountRaw ?? 0;
 
   return {
     plan,

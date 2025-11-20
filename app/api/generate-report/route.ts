@@ -44,7 +44,8 @@ async function resolveUserEmail(userId: string, sessionClaims: any) {
   const claimEmail = (sessionClaims?.email as string | undefined)?.toLowerCase();
   if (claimEmail) return claimEmail;
   try {
-    const user = await clerkClient.users.getUser(userId);
+    const clerk = await clerkClient();
+    const user = await clerk.users.getUser(userId);
     const primary = user.primaryEmailAddress?.emailAddress ?? user.emailAddresses[0]?.emailAddress;
     return primary?.toLowerCase();
   } catch (error) {
