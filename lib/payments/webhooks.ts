@@ -9,4 +9,4 @@ export function verifyStripeSignature(payload: Buffer, signature: string) {
   return stripe.webhooks.constructEvent(payload, signature, secret);
 }
 
-export type StripeSubscriptionPayload = Stripe.Checkout.Session & { metadata: { userId: string } };
+export type StripeSubscriptionPayload = Stripe.Checkout.Session & { metadata: { userId: string; plan?: string } };

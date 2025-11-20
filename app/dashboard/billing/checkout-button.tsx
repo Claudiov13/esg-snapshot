@@ -2,10 +2,12 @@
 
 import { useTransition } from 'react';
 import { Button } from '@/components/ui/button';
+import type { BillingPlan } from './actions';
 import { createCheckout } from './actions';
 
-export function CheckoutButton({ plan }: { plan: 'pro' | 'enterprise' }) {
+export function CheckoutButton({ plan, label }: { plan: BillingPlan; label?: string }) {
   const [isPending, startTransition] = useTransition();
+  const buttonLabel = label ?? 'Atualizar plano';
 
   return (
     <Button
@@ -13,14 +15,18 @@ export function CheckoutButton({ plan }: { plan: 'pro' | 'enterprise' }) {
       onClick={() => {
         startTransition(async () => {
           const result = await createCheckout(plan);
-          if (result.url) {
+          if (result?.error) {
+            alert(result.error);
+            return;
+          }
+          if (result?.url) {
             window.location.href = result.url;
           }
         });
       }}
       disabled={isPending}
     >
-      {isPending ? 'Processando...' : 'Atualizar plano'}
+      {isPending ? 'Processando...' : buttonLabel}
     </Button>
   );
 }

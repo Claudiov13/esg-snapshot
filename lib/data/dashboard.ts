@@ -30,7 +30,7 @@ export async function getDashboardStats(userId: string) {
       latestDocuments: [],
       totalReports: 0,
       latestReports: [],
-      plan: 'free',
+      plan: 'trial',
       status: 'trialing'
     };
   }
@@ -60,7 +60,7 @@ export async function getDashboardStats(userId: string) {
 
   const totalDocuments = documentsResult.count ?? documentsData.length;
   const totalReports = reportsResult.count ?? reportsData.length;
-  const plan = subscriptionData?.plan ?? 'free';
+  const plan = subscriptionData?.plan ?? 'trial';
   const status = subscriptionData?.status ?? 'trialing';
 
   return {

@@ -1,15 +1,16 @@
-﻿import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import { getOpenAIClient } from '@/lib/ai/openai';
 import { supabaseServer } from '@/lib/supabase/server';
+import { getUsageLimits } from '@/lib/limits';
 
 const questionnaireSchema = z.object({
   esgGoals: z.string().min(2),
   supplyChainProfile: z.string().min(2),
   stakeholderConcerns: z.string().min(2),
   partnerRegions: z.string().min(1),
-  riskTolerance: z.enum(['Baixa', 'Média', 'Alta']),
+  riskTolerance: z.enum(['Baixa', 'Media', 'Média', 'Alta']),
   dataReliability: z.enum(['Limitada', 'Parcial', 'Completa']),
   supplierEngagement: z.enum(['Inicial', 'Em desenvolvimento', 'Estruturado']),
   supplierNotes: z.string().optional().or(z.literal(''))
@@ -39,10 +40,33 @@ const OUTPUT_HINT = `Return a JSON object with the following shape:
   "supplier_summary": string
 }`;
 
+async function resolveUserEmail(userId: string, sessionClaims: any) {
+  const claimEmail = (sessionClaims?.email as string | undefined)?.toLowerCase();
+  if (claimEmail) return claimEmail;
+  try {
+    const user = await clerkClient.users.getUser(userId);
+    const primary = user.primaryEmailAddress?.emailAddress ?? user.emailAddresses[0]?.emailAddress;
+    return primary?.toLowerCase();
+  } catch (error) {
+    console.warn('[limits] nao foi possivel ler email do Clerk', error);
+    return undefined;
+  }
+}
+
 export async function POST(request: Request) {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
   if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+
+  const email = await resolveUserEmail(userId, sessionClaims);
+
+  const limits = await getUsageLimits(userId, email);
+  if (limits.remainingReports <= 0) {
+    return NextResponse.json(
+      { error: 'Limite de relatorios atingido para seu plano. Atualize para mensal ou compre um relatorio avulso.' },
+      { status: 403 }
+    );
   }
 
   const body = await request.json();
@@ -87,7 +111,7 @@ export async function POST(request: Request) {
 - Extra supplier notes: ${payload.questionnaire.supplierNotes || 'N/A'}
 `;
 
-  const prompt = `Você é um consultor ESG experiente. Crie um relatório ESG conciso e consistente para a empresa ou fornecedor descrito abaixo.
+  const prompt = `Voce e um consultor ESG experiente. Crie um relatorio ESG consistente e pratico, focado em valor de negocio (page=exec, ops e sustentabilidade) para a empresa ou fornecedor descrito abaixo. Respeite o JSON e os campos definidos no OUTPUT_HINT, mas entregue conteudo rico e acionavel.
 
 Company data:
 - Name: ${payload.companyName}
@@ -105,7 +129,20 @@ Uploaded documents:
 ${documentsSummary.length ? documentsSummary.join('\n') : 'No supporting documents were provided yet.'}
 
 ${OUTPUT_HINT}
-A resposta deve ser um JSON válido apenas, sem texto adicional.`;
+
+Regras de qualidade (aplique-as antes de responder):
+- executive_summary: 4-6 parrafos curtos cobrindo maturidade atual, 3 lacunas criticas, quick wins de 90 dias e beneficios financeiros/mitigacao de risco.
+- ods: 3-5 objetivos diretamente conectados ao negocio/setor, explicando o porquê; evite generico.
+- gri_topics: pelo menos 4 topicos materiais com explicacao objetiva (ligacao ao setor/risco e proxima acao).
+- risk_matrix: 4-6 riscos com probability/impact/prioridade coerentes e mitigacao concreta (dono + proxima acao).
+- action_plan: 6-8 blocos equilibrando curto e medio prazo, cada um com 2-3 bullets de acao objetivas e mensuraveis.
+- kpis: 6-8 KPIs, cada um com definicao, fórmula simples, baseline sugerido, meta e periodicidade.
+- scoreboard: atribua notas 0-100 para ambiente/social/governanca coerentes com lacunas citadas; nao use 0 ou 100.
+- supplier_summary: destaque dependencia de fornecedores, riscos de cadeia e passos rapidos de engajamento.
+- personalize pelo setor, porte e regiao; se faltarem dados, crie suposicoes plausiveis e assuma-as claramente.
+- Nao adicione texto fora do JSON.
+
+A resposta deve ser um JSON valido apenas, sem texto adicional.`;
 
   let reportContent: any;
   try {
@@ -168,7 +205,7 @@ A resposta deve ser um JSON válido apenas, sem texto adicional.`;
 
   if (insertError || !report) {
     const message = insertError?.code === '42P01'
-      ? 'Tabela esg_reports não encontrada. Execute supabase/schema.sql nas suas instâncias.'
+      ? 'Tabela esg_reports nao encontrada. Execute supabase/schema.sql nas suas instancias.'
       : insertError?.message ?? 'Unable to save report';
     return NextResponse.json({ error: message }, { status: 500 });
   }
